@@ -34,7 +34,7 @@ exports.htmlPages = function () {
       template: filepath,
       filename: `${filename}.html`,
       title: pageTitle[filename],
-      chunks: filename,
+      chunks: [filename],
       inject: true,
       hash: true,
       minify: {

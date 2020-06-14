@@ -114,7 +114,7 @@ const webpackConfig = () => {
     });
     config.plugins.push(htmlPlugin);
   });
-  return merge(config, isDev ? devConfig : prodConfig);
+  return isDev ? merge(config, devConfig) : merge(config, prodConfig);
 };
 
 module.exports = webpackConfig();

@@ -1,13 +1,14 @@
+const { join } = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const rimraf = require("rimraf");
 
 // 删除目录
 const rm = (rmPath) => {
-  rimraf(path(rmPath), (err) => err && console.log(err));
+  rimraf(join(__dirname, rmPath), (err) => err && console.log(err));
 };
 
 // 打包前删除 dist 目录
-rm("./dist");
+rm("../dist");
 
 module.exports = {
   mode: "production",
