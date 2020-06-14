@@ -1,9 +1,12 @@
 const { join } = require("path");
 const { DefinePlugin } = require("webpack");
 const merge = require("webpack-merge");
-const terserPlugin = require("terser-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const optimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin");
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
+// 多线程打包
+const HappyPack = require("happypack");
+const happyThreadPool = HappyPack.ThreadPool({ size: 5 });
 
 const { entries, htmlPages } = require("./config/entry");
 const devConfig = require("./config/webpack.dev");
@@ -72,6 +75,20 @@ const webpackConfig = () => {
       ],
     },
     plugins: [
+      new HappyPack({
+        // 用唯一的标识符 id 来代表当前的 HappyPack 是用来处理一类特定的文件
+        id: "babel",
+        // 如何处理 .js 文件，用法和 Loader 配置中一样
+        loaders: ["babel-loader?cacheDirectory"],
+        threadPool: happyThreadPool,
+      }),
+      new HappyPack({
+        id: "css",
+        // 如何处理 .css 文件，用法和 Loader 配置中一样
+        loaders: ["css-loader"],
+        threadPool: happyThreadPool,
+      }),
+      new VueLoaderPlugin(),
       new optimizeCssAssetsWebpackPlugin(),
       new DefinePlugin({
         "process.env": {
@@ -79,32 +96,6 @@ const webpackConfig = () => {
         },
       }),
     ],
-    optimization: {
-      splitChunks: {
-        cacheGroups: {
-          commons: {
-            name: "commons",
-            chunks: "initial",
-            minChunks: 2,
-            minSize: 0,
-          },
-        },
-      },
-      minimize: true,
-      minimizer: [
-        new terserPlugin({
-          cache: true, // 开启缓存
-          parallel: true, // 并行打包
-          sourceMap: true,
-          extractComments: true, // 删除注释
-          exclude: /(node_modules)/,
-          include: /(src)/,
-          terserOptions: {
-            ie8: false,
-          },
-        }),
-      ],
-    },
   };
   /*html*/
   const pages = htmlPages();

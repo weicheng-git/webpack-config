@@ -1,4 +1,5 @@
 const { join } = require("path");
+const terserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const rimraf = require("rimraf");
 
@@ -38,4 +39,32 @@ module.exports = {
       filename: `css/[name]_[contenthash:8].css`,
     }),
   ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          name: "commons",
+          chunks: "initial",
+          minChunks: 2,
+          minSize: 0,
+        },
+      },
+    },
+    minimize: true,
+    minimizer: [
+      new terserPlugin({
+        exclude: /(node_modules)/,
+        cache: true,
+        parallel: true,
+        sourceMap: true,
+        terserOptions: {
+          ie8: false,
+          output: {
+            comments: false,
+            beautify: false,
+          },
+        },
+      }),
+    ],
+  },
 };
