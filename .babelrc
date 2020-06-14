@@ -1,9 +1,7 @@
 {
   "presets": [
     ["@babel/preset-env", {
-      "target": {
-        "module": "es2015"
-      }
+      "module": "es2015"
     }],
     "@babel/preset-typescript"
   ],

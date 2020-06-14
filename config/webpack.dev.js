@@ -1,3 +1,5 @@
+const NamedModulesPlugin = require("webpack/lib/NamedModulesPlugin");
+
 module.exports = {
   mode: "development",
   devtool: "source-map",
@@ -14,6 +16,7 @@ module.exports = {
       },
     ],
   },
+  plugins: [new NamedModulesPlugin()],
   devServer: {
     proxy: {
       "/api": "http://localhost:4000",
@@ -23,7 +26,6 @@ module.exports = {
     hot: true,
     open: true,
     inline: false, // 优化自动刷新的性能
-    /*另一种思路: <script src="http://localhost:8080/webpack-dev-server.js"></script>*/
     // https: true,
     // contentBase: "./",
     // host: "0.0.0.0",
