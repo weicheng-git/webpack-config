@@ -1,0 +1,15 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "target": {
+        "module": "es2015"
+      }
+    }],
+    "@babel/preset-typescript"
+  ],
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    ["@babel/plugin-proposal-class-properties", {"legacy": true}],
+    ["@babel/plugin-proposal-decorators", {"legacy": true}]
+  ]
+}
