@@ -1,6 +1,9 @@
 module.exports = {
   mode: "development",
   devtool: "source-map",
+  watchOptions: {
+    ignored: /(node_modules)/,
+  },
   module: {
     rules: [
       {
@@ -19,6 +22,8 @@ module.exports = {
     profile: true,
     hot: true,
     open: true,
+    inline: false, // 优化自动刷新的性能
+    /*另一种思路: <script src="http://localhost:8080/webpack-dev-server.js"></script>*/
     // https: true,
     // contentBase: "./",
     // host: "0.0.0.0",
