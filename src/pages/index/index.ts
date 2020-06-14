@@ -1,3 +1,7 @@
+import Vue from "vue";
+
 import "./index.styl";
 
-document.body.innerHTML = "Base";
+new Vue({
+  render: (h) => h("div", "Vue"),
+}).$mount("#app");
