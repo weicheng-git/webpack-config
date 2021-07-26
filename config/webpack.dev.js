@@ -1,8 +1,17 @@
-const NamedModulesPlugin = require("webpack/lib/NamedModulesPlugin");
-
-module.exports = {
+const { merge } = require("webpack-merge");
+const webpackBaseConfig = require("./webpack.config");
+const webpack = require("webpack");
+module.exports = merge(webpackBaseConfig, {
   mode: "development",
+  target: "web", // 热更新不起作用需设置这个选项
   devtool: "source-map",
+  cache: {
+    type: "filesystem",
+    buildDependencies: {
+      config: [__filename],
+    },
+    name: `development-cache`,
+  },
   watchOptions: {
     ignored: /(node_modules)/,
   },
@@ -10,13 +19,12 @@ module.exports = {
     rules: [
       {
         test: /\.(styl|css)$/,
-        use: ["style-loader", "css-loader", "postcss-loader", "stylus-loader"],
+        use: ["style-loader", "css-loader", "postcss-loader"],
         // 排除 node_modules 目录下的文件
         exclude: /(node_modules)/,
       },
     ],
   },
-  plugins: [new NamedModulesPlugin()],
   devServer: {
     proxy: {
       "/api": "http://localhost:4000",
@@ -25,7 +33,7 @@ module.exports = {
     profile: true,
     hot: true,
     open: true,
-    inline: false, // 优化自动刷新的性能
+    inline: true, // 优化自动刷新的性能
     // https: true,
     // contentBase: "./",
     // host: "0.0.0.0",
@@ -42,4 +50,10 @@ module.exports = {
       ],
     },
   },
-};
+  plugins: [
+    new webpack.DefinePlugin({
+      PRODUCTION: JSON.stringify(false),
+      "process.env.NODE_ENV": JSON.stringify("development"),
+    }),
+  ],
+});

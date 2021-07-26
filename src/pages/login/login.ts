@@ -1,3 +1,1 @@
-import "./login.styl";
-
-document.body.innerHTML = "Login";
+document.body.innerHTML = "Login 2";

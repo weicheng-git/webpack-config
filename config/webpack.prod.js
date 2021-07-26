@@ -1,7 +1,12 @@
 const { join } = require("path");
-const terserPlugin = require("terser-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const rimraf = require("rimraf");
+const webpack = require("webpack");
+const { merge } = require("webpack-merge");
+const webpackBaseConfig = require("./webpack.config");
+
+console.log("production");
 
 // 删除目录
 const rm = (rmPath) => {
@@ -11,23 +16,23 @@ const rm = (rmPath) => {
 // 打包前删除 dist 目录
 rm("../dist");
 
-module.exports = {
+module.exports = merge(webpackBaseConfig, {
   mode: "production",
   devtool: false,
   module: {
     rules: [
       {
-        test: /\.(styl|css)$/,
+        test: /\.(css)$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
               esModule: true,
+              publishPath: "./",
             },
           },
           "css-loader",
           "postcss-loader",
-          "stylus-loader",
         ],
         // 排除 node_modules 目录下的文件
         exclude: /(node_modules)/,
@@ -37,6 +42,10 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: `css/[name]_[contenthash:8].css`,
+    }),
+    new webpack.DefinePlugin({
+      PRODUCTION: JSON.stringify(true),
+      "process.env.NODE_ENV": JSON.stringify("production"),
     }),
   ],
   optimization: {
@@ -52,11 +61,10 @@ module.exports = {
     },
     minimize: true,
     minimizer: [
-      new terserPlugin({
+      new TerserPlugin({
+        test: /\.js(\?.*)?$/i,
         exclude: /(node_modules)/,
-        cache: true,
         parallel: true,
-        sourceMap: true,
         terserOptions: {
           ie8: false,
           output: {
@@ -67,4 +75,4 @@ module.exports = {
       }),
     ],
   },
-};
+});

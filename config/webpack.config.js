@@ -1,25 +1,22 @@
 const { join } = require("path");
 const { DefinePlugin } = require("webpack");
-const merge = require("webpack-merge");
+const { merge } = require("webpack-merge");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const optimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 // 多线程打包
 const HappyPack = require("happypack");
+const webpack = require("webpack");
 const happyThreadPool = HappyPack.ThreadPool({ size: 5 });
 
-const { entries, htmlPages } = require("./config/entry");
-const devConfig = require("./config/webpack.dev");
-const prodConfig = require("./config/webpack.prod");
+const { entries, htmlPages } = require("./entry");
 
 const path = (dirPath) => join(__dirname, "./", dirPath);
 
-// env 环境判断
-const env = process.env.NODE_ENV;
-const isDev = env === "development";
-
 const webpackConfig = () => {
   const config = {
+    optimization: {
+      minimizer: [new CssMinimizerPlugin()],
+    },
     entry: entries(),
     output: {
       filename: "js/[name]_[hash:8].js",
@@ -30,7 +27,7 @@ const webpackConfig = () => {
         "@": "/src",
       },
       // 自动带上文件后缀
-      extensions: [".ts", ".js", ".json", ".css", ".styl"],
+      extensions: [".ts", ".js", ".json", ".css"],
     },
     module: {
       rules: [
@@ -51,26 +48,21 @@ const webpackConfig = () => {
           exclude: /(node_module)/,
         },
         {
-          test: /\.vue$/,
-          loader: ["vue-loader"],
-        },
-        {
           test: /\.ts$/,
           loader: "ts-loader",
           exclude: /(node_modules)/,
         },
         {
           test: /\.(gif|png|jpe?g|svg)$/,
-          use: [
-            {
-              loader: "url-loader",
-              options: {
-                limit: 10000,
-              },
+          type: "asset",
+          parser: {
+            dataUrlCondition: {
+              maxSize: 4 * 1024, // 4kb
             },
-          ],
-          exclude: /(node_modules)/,
-          include: /src/,
+          },
+          generator: {
+            filename: "static/[hash][ext][query]",
+          },
         },
       ],
     },
@@ -88,13 +80,6 @@ const webpackConfig = () => {
         loaders: ["css-loader"],
         threadPool: happyThreadPool,
       }),
-      new VueLoaderPlugin(),
-      new optimizeCssAssetsWebpackPlugin(),
-      new DefinePlugin({
-        "process.env": {
-          NODE_ENV: JSON.stringify("production"),
-        },
-      }),
     ],
   };
   /*html*/
@@ -105,7 +90,7 @@ const webpackConfig = () => {
     });
     config.plugins.push(htmlPlugin);
   });
-  return isDev ? merge(config, devConfig) : merge(config, prodConfig);
+  return config;
 };
 
 module.exports = webpackConfig();

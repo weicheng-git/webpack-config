@@ -1,7 +1,1 @@
-import Vue from "vue";
-
-import "./index.styl";
-
-new Vue({
-  render: (h) => h("div", "Vue"),
-}).$mount("#app");
+document.body.innerHTML = "Hello Webpack5 1 2 3 4 5 6 123 ";
